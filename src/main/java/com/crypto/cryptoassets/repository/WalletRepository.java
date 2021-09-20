@@ -11,9 +11,12 @@ import com.crypto.cryptoassets.model.Assets;
 @Repository
 public class WalletRepository {
 
-	public Assets getCoinCapAccets(String ativo) {
+	ResponseEntity<Assets> assets = null;
+	
+	public synchronized Assets
+	getCoinCapAccets(String ativo) {
 		RestTemplate template = new RestTemplate();
-		ResponseEntity<Assets> entity = null;
+		
 		UriComponents uri = UriComponentsBuilder.newInstance().scheme("https")
 				.host("api.coincap.io")
 				.path("v2/assets/"+ativo+"/history")
@@ -22,12 +25,12 @@ public class WalletRepository {
 				.queryParam("end", "1617753601000")
 				.build();
 		try {
-				entity = template.getForEntity(uri.toString(), Assets.class);
+			assets = template.getForEntity(uri.toString(), Assets.class);
 		}catch(Exception e) {
 			 e.getMessage().contains("429");
 			 this.getCoinCapAccets(ativo);
 		}
-			return entity.getBody();
+			return assets.getBody();
 		}
 
 }
